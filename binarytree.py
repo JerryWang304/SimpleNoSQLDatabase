@@ -39,6 +39,10 @@ class Node(object):
     # is leaf ?
     def is_leaf(self):
         return self.left == -1 and self.right == -1
+    # is root ?
+    def is_root(self):
+        return self.offset == 0
+
     # write to disk
 def store(node, filename):
     # if node.get_offset() == 0:
@@ -55,13 +59,13 @@ def store(node, filename):
         size = f.tell() # current location of file (bytes)
         # print "file size = %d bytes" % size 
         if size % BLOCK_SIZE != 0:
-            print "padding bits in normal nodes"
+            #print "padding bits in normal nodes"
             f.write(b"\x00"*(BLOCK_SIZE - size%BLOCK_SIZE))
         #size = f.tell()
         #print "file size = %d bytes" % size 
 
 def store_root(node, count, filename):
-    print "\n store root ... "
+    #print "\n store root ... "
     with open(filename, 'rb+') as f:
         f.seek(0)
         data = convert_node_to_string(node)
@@ -75,7 +79,7 @@ def store_root(node, count, filename):
         size = f.tell() # current location of file (bytes)
         # print "file size = %d bytes" % size 
         if size % BLOCK_SIZE != 0:
-            print "padding bits in root... "
+            # print "padding bits in root... "
             f.write(b"\x00"*(BLOCK_SIZE - size%BLOCK_SIZE))
         #size = f.tell()
         #print "file size = %d bytes" % size 
@@ -123,12 +127,12 @@ class BinaryTree(object):
             print "already exists %d nodes " % self.count
             self.root = read_from_the_beginning_of_disk(self.filename)
             
-        # print "root: ", self.root
+        print "root: ", self.root
         
     # insert (k,v) if it does not exist
     # else doesn't change anything    
     def set(self,k,v):
-        
+        assert type(k) == int and type(v) == int 
         node  =  self.root  # the current node
         
         # if (k,v) is the first pair
@@ -137,42 +141,58 @@ class BinaryTree(object):
             self.root = new_node
             self.count += 1 # now we have the first node 
             store_root(self.root, 1,  self.filename)
+            print "new root = ",
+            print self.root
             #store_count(self.count, self.filename)
         #elif self.root
         else:
-            offset = self.count
-            new_node = Node(offset,k,v,-1,-1)
-            
             # now we should do binary search
             while True:
+                print "k = ",k
+                print "node.key = ",node.key
+                # k is str !!!
+                #if k> node.key: 
+                #    print "{%d} > {%d}" % (int(k),int(node.key))
+                print "current node to compare :", node 
                 if k > node.key:
-                    print "move to right"
+                    print "****** right ******"
                     if node.right != -1:
+                        print "move further (right)"
                         node = read_from_specific_address(node.right, self.filename)
                     else: # insert it here
+                        #print "start to insert a new node"
+                        offset = self.count
+                        new_node = Node(offset,k,v,-1,-1)
                         node.right = offset
-                        self.count += 1
+                        #print "node = ", node 
+                        
+                        #print "root before stored = ",
+                        #print self.root
                         # node is modified so we re-write it into disk
                         # if the node is root ?
                         if node.offset == 0:
-                            store_root(node, self.count, self.filename) # already store the count
+                            store_root(node, self.count+1, self.filename) # already store the count
                         else:
                             store(node, self.filename) # not root 
-                            store_count(self.count, self.filename) 
+                            store_count(self.count+1, self.filename) 
                         
                         store(new_node, self.filename)
                         
-                        print "root: ", read_from_the_beginning_of_disk(self.filename)
-                        print "Insert a new node :",
-                        print new_node
+                        #print "root after ", 
+                        #print self.root
+                        #print read_from_the_beginning_of_disk(self.filename)
+                        #print "Insert a new node :",
+                        #print new_node
 
                         break
-                elif k < node.key:
-                    print "move to left"
+                elif node.key > k:
+                    print "****** left ******"
                     if node.left != -1:
                         node = read_from_specific_address(node.left, self.filename)
                     else:
                         # insert
+                        offset = self.count
+                        new_node = Node(offset,k,v,-1,-1)
                         node.left = offset
                         self.count += 1
                         # node is modified so we re-write it into disk
@@ -183,8 +203,8 @@ class BinaryTree(object):
                             store_count(self.count, self.filename)
 
                         store(new_node, self.filename)
-                        print "Insert a new node :",
-                        print new_node
+                        #print "Insert a new node :",
+                        #print new_node
                         break
                 else:
                     # k is the same
@@ -218,19 +238,27 @@ def convert_node_to_string(node):
             'offset' : node.offset,
             'key' : node.key,
             'value': node.value,
-            'right' : node.right,
             'left' : node.left,
+            'right' : node.right,
 
         })
 
 def convert_string_to_node(data):
     dic = pickle.loads(data)
+    #print "type of key = ",type(dic['key'])
+    # return Node(
+    #         int(dic['offset']),
+    #         int(dic['key']),
+    #         int(dic['value']),
+    #         int(dic['left']),
+    #         int(dic['right']),
+    #     )
     return Node(
             dic['offset'],
             dic['key'],
             dic['value'],
+            dic['left'],
             dic['right'],
-            dic['left']
         )
 # beginning location of a file
 def seek_to_beginning(f):
@@ -271,9 +299,9 @@ def read_from_the_beginning_of_disk(filename):
     with open(filename,'rb+') as f:
         #f.seek(4,0)
         count = convert_bytes_to_integer(f.read(4))
-        print "count = ", count 
+        #print "count = ", count 
         length = convert_bytes_to_integer(f.read(4))
-        print "length = ",length 
+        #print "length = ",length 
         data = convert_string_to_node(f.read(length)) 
     return data
 

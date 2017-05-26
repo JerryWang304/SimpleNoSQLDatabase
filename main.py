@@ -18,8 +18,9 @@ def main():
         return
     filename = sys.argv[1]
     command = sys.argv[2]
-    key = sys.argv[3]
-    value = sys.argv[4] if args_len == 5 else None
+    key = int(sys.argv[3])
+    value = int(sys.argv[4]) if args_len == 5 else None
+    # print "type of input key = ",type(key)
     print filename,command,key,value
     assert command in {'get','del','set'}
     # open the database
