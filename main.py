@@ -21,20 +21,20 @@ def main():
     key = int(sys.argv[3])
     value = int(sys.argv[4]) if args_len == 5 else None
     # print "type of input key = ",type(key)
-    print filename,command,key,value
+    #print filename,command,key,value
     assert command in {'get','del','set'}
     # open the database
     db = Database(filename)
     if command == "get":
 
-        print "command = ",command
+        db.get(key)
         
     elif command == "del":
 
         print "command = ", command
     elif command == "set":
         assert value != None 
-        print "command = ", command
+        #print "command = ", command
         db.set(key,value)
         #db.commit() no commit for simplicity
 

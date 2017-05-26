@@ -14,6 +14,12 @@ class Database(object):
         self.tree.set(k,v)
     # def commit():
     #     self.tree.store_to_disk()
+    def get(self,k):
+        try:
+            print "value = ", self.tree.get(k)
+        except KeyError as e:
+            print "not found !"
+        
 
     
 
