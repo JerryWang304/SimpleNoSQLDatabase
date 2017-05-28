@@ -80,6 +80,8 @@ def convert_node_to_string(node):
             'left' : node.left,
             'right' : node.right,
             'valid' : node.valid,
+            'father': node.father,
+            'relative_position': node.relative_position,
 
         })
 
@@ -100,6 +102,8 @@ def convert_string_to_node(data):
             dic['left'],
             dic['right'],
             dic['valid'],
+            dic['father'],
+            dic['relative_position'],
         )
 # beginning location of a file
 def seek_to_beginning(f):
@@ -156,46 +160,46 @@ def read_from_specific_address(offset,filename):
         data = convert_string_to_node(f.read(length)) 
     return data 
 
-# test read and write to disk 
-def test_write(filename):
-    node = Node(0,100,100,-1,-1)
-    data = convert_node_to_string(node)
-    f = open(filename,'wb')
-    length_of_data = len(data)
-    # write data to file
-    print "length = ",length_of_data
+# # test read and write to disk 
+# def test_write(filename):
+#     node = Node(0,100,100,-1,-1)
+#     data = convert_node_to_string(node)
+#     f = open(filename,'wb')
+#     length_of_data = len(data)
+#     # write data to file
+#     print "length = ",length_of_data
     
-    packed = convert_integer_to_bytes(length_of_data)
-    # len(packed) == 4
-    print "length packed = ", packed
-    length = struct.unpack('I',packed) # which is a tuple
-    print "length unpacked = ", length[0]
-    print convert_string_to_node(data)
-    # store length+data into file 
-    # length is 4 bytes and data is 90 bytes
-    seek_to_beginning(f)
-    # firstly write the 4 Bytes length
-    f.write(packed)
-    # then write the actual data
-    f.write(data)
-    # fill in extra bytes to be 4KB size
-    seek_to_end(f) 
-    size = f.tell() # current location of file (bytes)
-    #print "file size = %d bytes" % size 
-    if size % BLOCK_SIZE != 0:
-        f.write(b"\x00"*(BLOCK_SIZE - size%BLOCK_SIZE))
-    size = f.tell()
-    print "file size = %d bytes" % size 
-    f.close()
+#     packed = convert_integer_to_bytes(length_of_data)
+#     # len(packed) == 4
+#     print "length packed = ", packed
+#     length = struct.unpack('I',packed) # which is a tuple
+#     print "length unpacked = ", length[0]
+#     print convert_string_to_node(data)
+#     # store length+data into file 
+#     # length is 4 bytes and data is 90 bytes
+#     seek_to_beginning(f)
+#     # firstly write the 4 Bytes length
+#     f.write(packed)
+#     # then write the actual data
+#     f.write(data)
+#     # fill in extra bytes to be 4KB size
+#     seek_to_end(f) 
+#     size = f.tell() # current location of file (bytes)
+#     #print "file size = %d bytes" % size 
+#     if size % BLOCK_SIZE != 0:
+#         f.write(b"\x00"*(BLOCK_SIZE - size%BLOCK_SIZE))
+#     size = f.tell()
+#     print "file size = %d bytes" % size 
+#     f.close()
 
-def test_read(filename):
-    assert is_file_exists(filename) == True
-    with open(filename,'rb') as f:
-        length = convert_bytes_to_integer(f.read(4))
-        data = convert_string_to_node(f.read(length))
-        print "\nlength = ",length
-        print "data = ",data
-        print "filesize = %dB" % os.path.getsize(filename)
+# def test_read(filename):
+#     assert is_file_exists(filename) == True
+#     with open(filename,'rb') as f:
+#         length = convert_bytes_to_integer(f.read(4))
+#         data = convert_string_to_node(f.read(length))
+#         print "\nlength = ",length
+#         print "data = ",data
+#         print "filesize = %dB" % os.path.getsize(filename)
 
 
 if __name__ == '__main__':

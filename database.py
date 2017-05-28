@@ -16,7 +16,10 @@ class Database(object):
     #     self.tree.store_to_disk()
     def get(self,k):
         try:
-            print "value = ", self.tree.get(k)
+            node = self.tree.get(k)
+            #print self.tree.find_right_min(node)
+            print "value = ", node.get_value()
+
         except KeyError as e:
             print "node not found !"
     def delete(self,k):
