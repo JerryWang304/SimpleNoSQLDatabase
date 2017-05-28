@@ -18,7 +18,9 @@ class Database(object):
         try:
             print "value = ", self.tree.get(k)
         except KeyError as e:
-            print "not found !"
+            print "node not found !"
+    def delete(self,k):
+        self.tree.delete(k)
         
 
     

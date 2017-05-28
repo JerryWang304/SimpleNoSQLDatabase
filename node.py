@@ -6,6 +6,7 @@ class Node(object):
         self.value = v      # value stored in the node
         self.left = left    # integer type: the offset of left node
         self.right = right  # integer type
+        self.valid = 1
     # formated string
     def __str__(self):
         ret  = ''

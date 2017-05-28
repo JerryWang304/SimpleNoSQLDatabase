@@ -47,14 +47,25 @@ class BinaryTree(object):
                 if node.left != -1:
                     node = read_from_specific_address(node.left, self.filename)
             else:
-                return node.value 
+                if node.valid == 1:
+                    return node.value 
         # the node must be the root 
-        if node.key == k:
+        if node.key == k and node.valid == 1:
             return node.value
-        else:
-            raise KeyError
+        
+        raise KeyError
 
+    # delete a node
+    # but actually the node is not deleted from disk
+    def delete(self,k):
+        # first find the node
+        try:
+            node = self.get(k)
+            node.valid = 0
+            # save this node to disk 
 
+        except KeyError as e:
+            print "node not found!"
 
     # insert (k,v) if it does not exist
     # else doesn't change anything    

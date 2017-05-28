@@ -1,6 +1,7 @@
 import os
 import struct
 from node import Node
+
 try: 
     import cPickle as pickle 
 except:
@@ -78,6 +79,7 @@ def convert_node_to_string(node):
             'value': node.value,
             'left' : node.left,
             'right' : node.right,
+            'valid' : node.valid,
 
         })
 
@@ -97,6 +99,7 @@ def convert_string_to_node(data):
             dic['value'],
             dic['left'],
             dic['right'],
+            dic['valid'],
         )
 # beginning location of a file
 def seek_to_beginning(f):

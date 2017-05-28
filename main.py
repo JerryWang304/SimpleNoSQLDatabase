@@ -30,7 +30,7 @@ def main():
         db.get(key)
         
     elif command == "del":
-
+        db.delete(key)
         print "command = ", command
     elif command == "set":
         assert value != None 
