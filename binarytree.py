@@ -48,16 +48,31 @@ class BinaryTree(object):
                 if node.left != -1:
                     node = read_from_specific_address(node.left, self.filename)
             else:
-                #if node.valid == 1:
-                 #   return node.value 
-                return node 
+                if node.valid == 1:
+                   return node
+                else:
+                    raise KeyError
+                #return node 
         # the node must be the root 
-        if node.key == k: #and node.valid == 1:
+        if node.key == k and node.valid == 1:
             #return node.value
             return node 
         
         raise KeyError
 
+    def new_delete(self,k):
+        try:
+            node = self.get(k)
+            node.valid = 0
+
+            if node.get_offset() > 0:
+                store(node, self.filename)
+            else:
+                # it is the root node
+                store_root(node, self.count, self.filename)
+
+        except KeyError:
+            print "node doesn't exist!"
     # delete a node
     # but actually the node is not deleted from disk
     # **** update root's value, don't reserve it for simpilicity

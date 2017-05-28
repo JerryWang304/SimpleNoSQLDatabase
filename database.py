@@ -10,6 +10,7 @@ class Database(object):
     #(key, value) may already exists in the database
     # actually insert it into the tree
     # won'y commit yet
+
     def set(self,k,v):
         self.tree.set(k,v)
     # def commit():
@@ -21,9 +22,10 @@ class Database(object):
             print "value = ", node.get_value()
 
         except KeyError as e:
-            print "node not found !"
+            print "node doesn't exist !"
+        
     def delete(self,k):
-        self.tree.delete(k)
+        self.tree.new_delete(k)
         
 
     
