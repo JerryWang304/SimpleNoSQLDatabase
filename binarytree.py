@@ -1,7 +1,7 @@
 #!usr/bin/python
 # coding: utf-8
 
-from disk_operations import *
+from disk_operations import Disk
 
 from node import Node
 
@@ -12,9 +12,10 @@ class BinaryTree(object):
     # the new node's offset is (self.count)
     def __init__(self, filename):
         self.filename = filename
+        self.operate = Disk(filename)
         # if the filename does not exist then create a new one
         # else return the first one 
-        if not is_file_exists(self.filename):
+        if not self.operate.is_file_exists():
             self.root = None # note that the disk is still empty
             #self.count += 1
             self.count = 0
@@ -25,9 +26,9 @@ class BinaryTree(object):
         else:
             # read from disk
             #with open(filename,'rb') as f:
-            self.count = get_count(self.filename)
+            self.count = self.operate.get_count()
             #print "already exists %d nodes " % self.count
-            self.root = read_from_the_beginning_of_disk(self.filename)
+            self.root = self.operate.read_from_the_beginning_of_disk()
             
         #print "root: ", self.root
     # return the associated node 
@@ -43,10 +44,10 @@ class BinaryTree(object):
             print "node = ",node 
             if k > node.key:
                 if node.right != -1:
-                    node = read_from_specific_address(node.right, self.filename)
+                    node = self.operate.read_from_specific_address(node.right)
             elif k < node.key:
                 if node.left != -1:
-                    node = read_from_specific_address(node.left, self.filename)
+                    node = self.operate.read_from_specific_address(node.left)
             else:
                 if node.valid == 1:
                    return node
@@ -66,10 +67,10 @@ class BinaryTree(object):
             node.valid = 0
 
             if node.get_offset() > 0:
-                store(node, self.filename)
+                self.operate.store(node)
             else:
                 # it is the root node
-                store_root(node, self.count, self.filename)
+                self.operate.store_root(node, self.count)
 
         except KeyError:
             print "node doesn't exist!"
@@ -100,7 +101,7 @@ class BinaryTree(object):
     def delete_leaf(self,node):
         #father_offset = node.father
 
-        father_node = read_from_specific_address(node.father, self.filename)
+        father_node = self.operate.read_from_specific_address(node.father)
         if node.relative_position == -1:
             # in the left
             father_node.left = -1
@@ -110,14 +111,14 @@ class BinaryTree(object):
             raise AttributeError
         # now update father node in the disk
         if father_node.get_offset() > 0:
-            store(father_node, self.filename)
+            self.operate.store(father_node)
         else:
             # it is the root node
-            store_root(father_node, self.count, self.filename)
+            self.operate.store_root(father_node, self.count)
     # Two delete
     def delete_two(self, node):
         # node has left child
-        father_node = read_from_specific_address(node.father, self.filename)
+        father_node = self.operate.read_from_specific_address(node.father)
         if node.only_has_left():
             update = node.left
         # node has right child 
@@ -132,16 +133,16 @@ class BinaryTree(object):
             print "wrong"
         # now update father node in the disk
         if father_node.get_offset() > 0:
-            store(father_node, self.filename)
+            self.operate.store(father_node)
         else:
             # it is the root node
-            store_root(father_node, self.count, self.filename)
+            self.operate.store_root(father_node, self.count)
     # Three delete: find the minimum node in its right
     def delete_three(self, node):
         changed_node = []
         min_node = self.find_right_min(node)
-        father_of_min_node = read_from_specific_address(min_node.father, self.filename)
-        father_of_node = read_from_specific_address(node.father, self.filename)
+        father_of_min_node = self.operate.read_from_specific_address(min_node.father)
+        father_of_node = self.operate.read_from_specific_address(node.father)
         if node.is_root():
             # update its value
             if min_node.father == 0:
@@ -149,7 +150,7 @@ class BinaryTree(object):
                 node.value = min_node.value
                 #changed_node.push(node)
                 if min_node.right != -1:
-                    min_node_child = read_from_specific_address(min_node.right, self.filename)
+                    min_node_child = self.operate.read_from_specific_address(min_node.right)
                     min_node_child.father = 0
                     changed_node.push(min_node_child)
             else:
@@ -193,14 +194,14 @@ class BinaryTree(object):
     # find the minimum node in its right
     def find_right_min(self, node):
         assert node.right > 0
-        first_node = read_from_specific_address(node.right, self.filename)
+        first_node = self.operate.read_from_specific_address(node.right)
         # if first node has no left child, then it is the smallest
         if first_node.left == -1:
             return first_node
         else:
             # run along the left
             while first_node.left != -1:
-                first_node = read_from_specific_address(first_node.left, self.filename)
+                first_node = self.operate.read_from_specific_address(first_node.left)
             return first_node 
 
 
@@ -215,7 +216,7 @@ class BinaryTree(object):
             new_node = Node(0,k,v,-1,-1,father=-1)
             self.root = new_node
             self.count += 1 # now we have the first node 
-            store_root(self.root, 1,  self.filename)
+            self.operate.store_root(self.root, 1)
             print "new root = ",
             print self.root
             #store_count(self.count, self.filename)
@@ -233,7 +234,7 @@ class BinaryTree(object):
                     print "****** right ******"
                     if node.right != -1:
                         print "move further (right)"
-                        node = read_from_specific_address(node.right, self.filename)
+                        node = self.operate.read_from_specific_address(node.right)
                     else: # insert it here
                         #print "start to insert a new node"
                         offset = self.count
@@ -246,12 +247,12 @@ class BinaryTree(object):
                         # node is modified so we re-write it into disk
                         # if the node is root ?
                         if node.offset == 0:
-                            store_root(node, self.count+1, self.filename) # already store the count
+                            self.operate.store_root(node, self.count+1) # already store the count
                         else:
-                            store(node, self.filename) # not root 
-                            store_count(self.count+1, self.filename) 
+                            self.operate.store(node) # not root 
+                            self.operate.store_count(self.count+1) 
                         
-                        store(new_node, self.filename)
+                        self.operate.store(new_node)
                         
                         #print "root after ", 
                         #print self.root
@@ -263,7 +264,7 @@ class BinaryTree(object):
                 elif node.key > k:
                     print "****** left ******"
                     if node.left != -1:
-                        node = read_from_specific_address(node.left, self.filename)
+                        node = self.operate.read_from_specific_address(node.left)
                     else:
                         # insert
                         offset = self.count
@@ -272,12 +273,12 @@ class BinaryTree(object):
                         self.count += 1
                         # node is modified so we re-write it into disk
                         if node.offset == 0:
-                            store_root(node, self.count, self.filename)
+                            self.operate.store_root(node, self.count)
                         else:
-                            store(node, self.filename)
-                            store_count(self.count, self.filename)
+                            self.operate.store(node)
+                            self.operate.store_count(self.count)
 
-                        store(new_node, self.filename)
+                        self.operate.store(new_node)
                         #print "Insert a new node :",
                         #print new_node
                         break
@@ -287,10 +288,10 @@ class BinaryTree(object):
                         node.set_value(v)
 
                         if node.get_offset() > 0:
-                            store(node, self.filename)
+                            self.operate.store(node)
                         else:
                             # it is the root node
-                            store_root(node, self.count, self.filename)
+                            self.operate.store_root(node, self.count)
                     break
 
 
