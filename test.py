@@ -4,20 +4,23 @@ import os
 import random
 import time
 import datetime
-MIN = -5000
-MAX = 10000
+MIN = -10
+MAX = 30
 def test():
     t = 1
     total_time = 0
-    while t<=10000:
+    keys = []
+    while t<= 20:
         t += 1
         key = random.randint(MIN,MAX)
+        keys.append(key)
         value = random.randint(-100,100)
         begin = time.clock()
-        cmd = 'python main.py test.db set %d %d' % (key, value)
+        cmd = 'python main.py first.txt set %d %d' % (key, value)
         os.system(cmd)
         end = time.clock()
         total_time += end-begin
+    print "**** keys = ",keys
     return total_time
 if __name__ == '__main__':
     print "total time = ", test()

@@ -30,7 +30,14 @@ class BinaryTree(object):
             #print "already exists %d nodes " % self.count
             self.root = self.operate.read_from_the_beginning_of_disk()
             
-        #print "root: ", self.root
+        print "count: ", self.count
+    # print all the nodes
+    def show(self):
+        print "root = ",self.root 
+        for i in range(1,self.count):
+            node = self.operate.read_from_specific_address(i)
+            print "node %d = " % i ,
+            print node 
     # return the associated node 
     def get(self, k):
         assert type(k) == int
@@ -58,7 +65,8 @@ class BinaryTree(object):
         if node.key == k and node.valid == 1:
             #return node.value
             return node 
-        
+        # test
+        #self.show()
         raise KeyError
 
     def new_delete(self,k):
@@ -210,7 +218,7 @@ class BinaryTree(object):
     def set(self,k,v):
         assert type(k) == int and type(v) == int 
         node  =  self.root  # the current node
-        
+        print "in set, count = ",self.count
         # if (k,v) is the first pair
         if self.root == None:
             new_node = Node(0,k,v,-1,-1,father=-1)
