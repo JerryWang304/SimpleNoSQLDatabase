@@ -45,6 +45,7 @@ class BinaryTree(object):
             raise KeyError
         node = self.root
         # find the leaf node 
+        
         # if the root node is a leaf then the while-loop will be passed
         while not node.is_leaf():
             # print "hi"
