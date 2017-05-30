@@ -45,7 +45,7 @@ class BinaryTree(object):
             raise KeyError
         node = self.root
         # find the leaf node 
-        
+
         # if the root node is a leaf then the while-loop will be passed
         while not node.is_leaf():
             # print "hi"
@@ -296,8 +296,17 @@ class BinaryTree(object):
                         #print new_node
                         break
                 else:
-                    # k is the same
-                    if node.value != v:
+                    # k is the same and this node is deleted 
+                    if node.valid == 0:
+                        node.valid = 1
+                        node.set_value(v)
+                        if node.get_offset() > 0:
+                            self.operate.store(node)
+                        else:
+                            # it is the root node
+                            self.operate.store_root(node, self.count)
+                    # the node is not deleted
+                    elif node.valid == 1 and node.value != v:
                         node.set_value(v)
 
                         if node.get_offset() > 0:
