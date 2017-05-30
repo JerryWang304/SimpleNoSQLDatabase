@@ -17,13 +17,13 @@ class Disk(object):
     # lock file
     def lock(self,file):
         if not self.locked:
-            #portalocker.lock(file, portalocker.LOCK_EX)
+            portalocker.lock(file, portalocker.LOCK_EX)
             self.locked = True
     # unlock file
     def unlock(self,file):
         if self.locked:
             #self.filename
-            #portalocker.unlock(file)
+            portalocker.unlock(file)
             self.locked = False 
     # write to disk
     def store(self, node):
@@ -75,6 +75,7 @@ class Disk(object):
     def get_count(self):
         with open(self.filename,'rb') as f:
             #print "length of count = ", len(f.read(4))
+            f.seek(0)
             count = self.convert_bytes_to_integer(f.read(4))
         return count 
 

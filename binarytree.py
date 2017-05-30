@@ -52,9 +52,13 @@ class BinaryTree(object):
             if k > node.key:
                 if node.right != -1:
                     node = self.operate.read_from_specific_address(node.right)
+                else:
+                    raise KeyError
             elif k < node.key:
                 if node.left != -1:
                     node = self.operate.read_from_specific_address(node.left)
+                else:
+                    raise KeyError 
             else:
                 if node.valid == 1:
                    return node

@@ -4,13 +4,13 @@ import os
 import random
 import time
 import datetime
-MIN = -10
-MAX = 30
+MIN = -1000
+MAX = 3000
 def test():
     t = 1
     total_time = 0
     keys = []
-    while t<= 20:
+    while t<= 10000:
         t += 1
         key = random.randint(MIN,MAX)
         keys.append(key)
