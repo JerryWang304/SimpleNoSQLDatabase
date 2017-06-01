@@ -12,7 +12,6 @@ def check(args):
 def main():
     args_len = len(sys.argv) # length of input
     #print args_len
-    # illegal commands
     if args_len > 5 or args_len < 4:
         print "invalid input"
         return
@@ -28,16 +27,13 @@ def main():
     if command == "get":
 
         db.get(key)
-        
+
     elif command == "del":
         db.delete(key)
         print "command = ", command
     elif command == "set":
-        assert value != None 
-        #print "command = ", command
+        assert value != None
         db.set(key,value)
-        #db.commit() no commit for simplicity
-
 
 if __name__ == '__main__':
     main()
